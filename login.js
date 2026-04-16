@@ -4,27 +4,44 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (hash && hash.includes('access_token')) {
         const params = new URLSearchParams(hash.substring(1));
         const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
         
         if (accessToken) {
             // Parse the JWT to get user info
             const payload = JSON.parse(atob(accessToken.split('.')[1]));
+            const userId = payload.sub;
             
-            const fullname = payload.user_metadata?.full_name || payload.user_metadata?.name;
-            const isNewUser = payload.app_metadata?.provider === 'google' && !fullname;
+            // Check Supabase for profile
+            const supabase = getSupabase();
+            let profile = null;
+            if (supabase) {
+                const { data } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                profile = data;
+            }
+            
+            // Check if onboarding completed
+            const onboardingCompleted = profile?.onboarding_completed === true || !!profile?.fullname;
+            const fullname = profile?.fullname || payload.user_metadata?.full_name || payload.user_metadata?.name || null;
             
             setUser({
-                id: payload.sub,
+                id: userId,
                 email: payload.email,
-                fullname: fullname || null,
-                onboarding: !!fullname // if we have name, onboarding is done
+                fullname: fullname,
+                username: profile?.username || null,
+                avatar: profile?.avatar || null,
+                role: profile?.role || null,
+                discovery: profile?.discovery_source || null,
+                onboarding: onboardingCompleted
             });
             
             // Clear hash and redirect
             window.location.hash = '';
             
             // Redirect based on onboarding status
-            if (fullname) {
+            if (onboardingCompleted) {
                 window.location.href = 'dashboard.html';
             } else {
                 window.location.href = 'onboarding.html';
@@ -115,12 +132,19 @@ document.addEventListener('DOMContentLoaded', async function() {
                 .eq('id', data.user.id)
                 .single();
 
-            const fullname = profile?.fullname || null;
+            // Check if onboarding is completed (has fullname AND onboarding_completed flag)
+            const onboardingCompleted = profile?.onboarding_completed === true || !!profile?.fullname;
+            
+            // Save all profile data to localStorage
             setUser({
                 id: data.user.id,
                 email: data.user.email,
-                fullname: fullname,
-                onboarding: !!fullname
+                fullname: profile?.fullname || null,
+                username: profile?.username || null,
+                avatar: profile?.avatar || null,
+                role: profile?.role || null,
+                discovery: profile?.discovery_source || null,
+                onboarding: onboardingCompleted
             });
 
             // Redirect based on onboarding status
