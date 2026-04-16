@@ -1,4 +1,28 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    // Handle OAuth callback (tokens in URL hash)
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        
+        if (accessToken) {
+            // Parse the JWT to get user info
+            const payload = JSON.parse(atob(accessToken.split('.')[1]));
+            
+            setUser({
+                id: payload.sub,
+                email: payload.email,
+                fullname: payload.user_metadata?.full_name || payload.email.split('@')[0]
+            });
+            
+            // Clear hash and redirect to dashboard
+            window.location.hash = '';
+            window.location.href = 'dashboard.html';
+            return;
+        }
+    }
+    
     // Redirect if already logged in
     if (isAuthenticated()) {
         window.location.href = 'dashboard.html';
