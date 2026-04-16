@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: 'https://grevillea.app/onboarding.html'
+                    redirectTo: 'https://grevillea.app/login.html'
                 }
             });
             if (error) alert('Google sign up failed: ' + error.message);
