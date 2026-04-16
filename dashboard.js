@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add task functionality
-    const addTaskBtn = document.querySelector('.btn-add');
+    const addTaskBtn = document.querySelector('.tasks-card .btn-add');
     if (addTaskBtn) {
         addTaskBtn.addEventListener('click', function() {
             const taskText = prompt('Enter task name:');
