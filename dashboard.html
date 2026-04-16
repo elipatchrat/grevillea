@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Grevillea</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="logo small">G</div>
+                <span>Grevillea</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    Notes
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Study Timer
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Calendar
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Messages
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Settings
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h2>Dashboard</h2>
+                <div class="top-bar-actions">
+                    <button class="btn-icon" title="Search">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" title="Notifications">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </button>
+                    <div class="user-menu">
+                        <div class="avatar">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">12h 45m</span>
+                            <span class="stat-label">Study Time This Week</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">24</span>
+                            <span class="stat-label">Notes Created</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">8</span>
+                            <span class="stat-label">Upcoming Tasks</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">5</span>
+                            <span class="stat-label">Day Streak</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card tasks-card">
+                        <div class="card-header">
+                            <h3>Today's Tasks</h3>
+                            <a href="#" class="link">View all</a>
+                        </div>
+                        <div class="task-list">
+                            <label class="task-item">
+                                <input type="checkbox" class="task-checkbox">
+                                <span class="task-text">Complete Math Assignment</span>
+                                <span class="task-tag urgent">Urgent</span>
+                            </label>
+                            <label class="task-item">
+                                <input type="checkbox" class="task-checkbox">
+                                <span class="task-text">Review Biology Notes</span>
+                                <span class="task-tag">Study</span>
+                            </label>
+                            <label class="task-item">
+                                <input type="checkbox" class="task-checkbox" checked>
+                                <span class="task-text completed">Read Chapter 3 - History</span>
+                            </label>
+                            <label class="task-item">
+                                <input type="checkbox" class="task-checkbox">
+                                <span class="task-text">Group Project Meeting</span>
+                                <span class="task-tag meeting">Meeting</span>
+                            </label>
+                        </div>
+                        <button class="btn-add">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Task
+                        </button>
+                    </div>
+
+                    <div class="card notes-card">
+                        <div class="card-header">
+                            <h3>Recent Notes</h3>
+                            <a href="#" class="link">View all</a>
+                        </div>
+                        <div class="notes-list">
+                            <div class="note-item">
+                                <div class="note-icon">📚</div>
+                                <div class="note-content">
+                                    <h4>Calculus Derivatives</h4>
+                                    <p>Key rules for differentiation...</p>
+                                    <span class="note-meta">Math • 2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="note-item">
+                                <div class="note-icon">🧪</div>
+                                <div class="note-content">
+                                    <h4>Organic Chemistry Lab</h4>
+                                    <p>Experiment observations and...</p>
+                                    <span class="note-meta">Chemistry • Yesterday</span>
+                                </div>
+                            </div>
+                            <div class="note-item">
+                                <div class="note-icon">📖</div>
+                                <div class="note-content">
+                                    <h4>Essay Outline - Shakespeare</h4>
+                                    <p>Thesis statement and main...</p>
+                                    <span class="note-meta">English • 2 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card study-card">
+                        <div class="card-header">
+                            <h3>Study Session</h3>
+                        </div>
+                        <div class="timer-display">
+                            <span class="timer-time">25:00</span>
+                            <span class="timer-label">Pomodoro Timer</span>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="btn-timer primary">Start</button>
+                            <button class="btn-timer">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="card calendar-card">
+                        <div class="card-header">
+                            <h3>This Week</h3>
+                        </div>
+                        <div class="week-view">
+                            <div class="day-column">
+                                <span class="day-label">Mon</span>
+                                <span class="day-number">14</span>
+                                <div class="day-dot"></div>
+                            </div>
+                            <div class="day-column">
+                                <span class="day-label">Tue</span>
+                                <span class="day-number">15</span>
+                                <div class="day-dot active"></div>
+                            </div>
+                            <div class="day-column">
+                                <span class="day-label">Wed</span>
+                                <span class="day-number">16</span>
+                                <div class="day-dot"></div>
+                            </div>
+                            <div class="day-column">
+                                <span class="day-label">Thu</span>
+                                <span class="day-number">17</span>
+                                <div class="day-dot"></div>
+                            </div>
+                            <div class="day-column">
+                                <span class="day-label">Fri</span>
+                                <span class="day-number">18</span>
+                                <div class="day-dot"></div>
+                            </div>
+                            <div class="day-column">
+                                <span class="day-label">Sat</span>
+                                <span class="day-number">19</span>
+                                <div class="day-dot"></div>
+                            </div>
+                            <div class="day-column">
+                                <span class="day-label">Sun</span>
+                                <span class="day-number">20</span>
+                                <div class="day-dot"></div>
+                            </div>
+                        </div>
+                        <div class="upcoming-event">
+                            <div class="event-dot"></div>
+                            <div class="event-info">
+                                <span class="event-title">Physics Midterm</span>
+                                <span class="event-time">Today, 2:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
