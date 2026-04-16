@@ -6,10 +6,17 @@
     <title>Grevillea - Student Study Organizer</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        // Default to login page - signup is secondary
-        if (!localStorage.getItem('grevillea_user')) {
-            window.location.href = 'login.html';
+        // If already logged in, redirect appropriately
+        const userData = localStorage.getItem('grevillea_user');
+        if (userData) {
+            const user = JSON.parse(userData);
+            if (user.onboarding) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'onboarding.html';
+            }
         }
+        // Otherwise stay on signup page
     </script>
 </head>
 <body>
