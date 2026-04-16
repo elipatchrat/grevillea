@@ -115,7 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const supabase = getSupabase();
         if (supabase) {
             const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google'
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + '/dashboard.html'
+                }
             });
             if (error) alert('Google sign in failed: ' + error.message);
         } else {

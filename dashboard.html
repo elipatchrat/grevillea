@@ -303,8 +303,31 @@
     <script src="auth.js"></script>
     <script src="dashboard.js"></script>
     <script>
-        // Update avatar and handle logout
-        document.addEventListener('DOMContentLoaded', function() {
+        // Handle OAuth redirect and sync session
+        document.addEventListener('DOMContentLoaded', async function() {
+            const supabase = getSupabase();
+            
+            // If coming from OAuth, sync the session
+            if (supabase) {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (session?.user) {
+                    // Sync with localStorage
+                    const user = getUser();
+                    if (!user || user.id !== session.user.id) {
+                        setUser({
+                            id: session.user.id,
+                            email: session.user.email,
+                            fullname: session.user.user_metadata?.fullname || session.user.email.split('@')[0]
+                        });
+                    }
+                } else if (!isAuthenticated()) {
+                    // No session and not authenticated, redirect to login
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+            
             updateUIForUser();
             
             document.getElementById('logout-btn')?.addEventListener('click', function() {
