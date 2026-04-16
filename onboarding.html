@@ -87,72 +87,91 @@
             </div>
         </div>
 
-        <!-- Step 2: Study Goals -->
+        <!-- Step 2: Role & Discovery -->
         <div class="onboarding-step" id="step-2">
             <div class="step-content">
                 <div class="brand">
                     <div class="logo">G</div>
-                    <h1>Your Study Goals</h1>
-                    <p class="tagline">What do you want to achieve?</p>
+                    <h1>Tell Us About You</h1>
+                    <p class="tagline">Help us understand how you learn.</p>
                 </div>
 
-                <form id="goals-form" class="onboarding-form">
+                <form id="role-form" class="onboarding-form">
                     <div class="form-group">
-                        <label>What are you studying? (Select all that apply)</label>
-                        <div class="study-tags">
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="math">
-                                <span>Mathematics</span>
+                        <label>What best describes you? *</label>
+                        <div class="role-options">
+                            <label class="role-card">
+                                <input type="radio" name="role" value="student" required>
+                                <div class="role-content">
+                                    <span class="role-icon">🎓</span>
+                                    <span class="role-title">Student</span>
+                                    <span class="role-desc">High school or university</span>
+                                </div>
                             </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="science">
-                                <span>Science</span>
+                            <label class="role-card">
+                                <input type="radio" name="role" value="educator">
+                                <div class="role-content">
+                                    <span class="role-icon">👨‍🏫</span>
+                                    <span class="role-title">Educator</span>
+                                    <span class="role-desc">Teacher or professor</span>
+                                </div>
                             </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="english">
-                                <span>English</span>
+                            <label class="role-card">
+                                <input type="radio" name="role" value="professional">
+                                <div class="role-content">
+                                    <span class="role-icon">💼</span>
+                                    <span class="role-title">Professional</span>
+                                    <span class="role-desc">Career development</span>
+                                </div>
                             </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="history">
-                                <span>History</span>
-                            </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="programming">
-                                <span>Programming</span>
-                            </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="languages">
-                                <span>Languages</span>
-                            </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="medicine">
-                                <span>Medicine</span>
-                            </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="law">
-                                <span>Law</span>
-                            </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="business">
-                                <span>Business</span>
-                            </label>
-                            <label class="study-tag">
-                                <input type="checkbox" name="subjects" value="art">
-                                <span>Art & Design</span>
+                            <label class="role-card">
+                                <input type="radio" name="role" value="hobbyist">
+                                <div class="role-content">
+                                    <span class="role-icon">🌱</span>
+                                    <span class="role-title">Hobbyist</span>
+                                    <span class="role-desc">Learning for fun</span>
+                                </div>
                             </label>
                         </div>
+                        <span class="error-message" id="role-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="study-hours">How many hours do you study per week?</label>
-                        <select id="study-hours" name="study-hours">
-                            <option value="">Select hours...</option>
-                            <option value="0-5">0-5 hours</option>
-                            <option value="5-10">5-10 hours</option>
-                            <option value="10-20">10-20 hours</option>
-                            <option value="20-40">20-40 hours</option>
-                            <option value="40+">40+ hours</option>
-                        </select>
+                        <label>How did you hear about Grevillea?</label>
+                        <div class="discovery-options">
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="youtube">
+                                <span>YouTube</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="instagram">
+                                <span>Instagram</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="tiktok">
+                                <span>TikTok</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="linkedin">
+                                <span>LinkedIn</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="school">
+                                <span>University/School</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="friend">
+                                <span>Word of Mouth</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="search">
+                                <span>Search Engine</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="radio" name="discovery" value="other">
+                                <span>Other</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="form-navigation">

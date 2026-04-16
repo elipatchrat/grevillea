@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fullname: '',
         username: '',
         avatar: '🎓',
-        subjects: [],
-        studyHours: ''
+        role: '',
+        discovery: ''
     };
 
     // Avatar selection
@@ -53,26 +53,33 @@ document.addEventListener('DOMContentLoaded', function() {
         nextStep();
     });
 
-    // Step 2: Goals form
-    document.getElementById('goals-form')?.addEventListener('submit', function(e) {
+    // Step 2: Role form
+    document.getElementById('role-form')?.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Get selected subjects
-        const selectedSubjects = [];
-        document.querySelectorAll('input[name="subjects"]:checked').forEach(cb => {
-            selectedSubjects.push(cb.value);
-        });
+        // Get selected role
+        const selectedRole = document.querySelector('input[name="role"]:checked');
+        const roleError = document.getElementById('role-error');
 
-        const studyHours = document.getElementById('study-hours').value;
+        if (!selectedRole) {
+            roleError.textContent = 'Please select your role';
+            roleError.classList.add('visible');
+            return;
+        }
 
-        userData.subjects = selectedSubjects;
-        userData.studyHours = studyHours;
+        roleError.classList.remove('visible');
 
-        // Save goals to user
+        // Get discovery source
+        const selectedDiscovery = document.querySelector('input[name="discovery"]:checked');
+
+        userData.role = selectedRole.value;
+        userData.discovery = selectedDiscovery ? selectedDiscovery.value : null;
+
+        // Save role/discovery to user
         const user = getUser();
         if (user) {
-            user.subjects = selectedSubjects;
-            user.studyHours = studyHours;
+            user.role = userData.role;
+            user.discovery = userData.discovery;
             setUser(user);
 
             // Save to Supabase if available
@@ -83,8 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     fullname: user.fullname,
                     username: user.username,
                     avatar: user.avatar,
-                    subjects: selectedSubjects,
-                    study_hours: studyHours,
+                    role: userData.role,
+                    discovery_source: userData.discovery,
                     updated_at: new Date().toISOString()
                 });
             }
@@ -161,8 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     fullname: user.fullname,
                     username: user.username,
                     avatar: user.avatar,
-                    subjects: user.subjects,
-                    study_hours: user.studyHours,
+                    role: user.role,
+                    discovery_source: user.discovery,
                     onboarding_completed: true,
                     updated_at: new Date().toISOString()
                 });
