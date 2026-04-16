@@ -1,0 +1,294 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #7c3aed;
+    --primary-dark: #6d28d9;
+    --primary-light: #a78bfa;
+    --secondary: #f59e0b;
+    --background: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --error: #ef4444;
+    --success: #22c55e;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 440px;
+}
+
+.signup-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: var(--shadow-lg);
+}
+
+.brand {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.logo {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto 16px;
+}
+
+.brand h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.tagline {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    background: var(--card);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.form-group input.error {
+    border-color: var(--error);
+}
+
+.form-group input.error:focus {
+    box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+}
+
+.error-message {
+    display: none;
+    font-size: 13px;
+    color: var(--error);
+    margin-top: 6px;
+}
+
+.error-message.visible {
+    display: block;
+}
+
+.form-group.checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.form-group.checkbox input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.form-group.checkbox label {
+    margin-bottom: 0;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.form-group.checkbox a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-group.checkbox a:hover {
+    text-decoration: underline;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.divider span {
+    padding: 0 16px;
+}
+
+.social-login {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-social {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-social:hover {
+    background: var(--background);
+    border-color: var(--text-muted);
+}
+
+.signin-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.signin-link a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signin-link a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .signup-card {
+        padding: 28px;
+    }
+    
+    .social-login {
+        flex-direction: column;
+    }
+}
+
+.success-message {
+    display: none;
+    text-align: center;
+    padding: 40px;
+}
+
+.success-message.visible {
+    display: block;
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.success-icon::after {
+    content: '✓';
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.success-message h2 {
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
+.success-message p {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
