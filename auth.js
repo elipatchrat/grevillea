@@ -27,12 +27,12 @@ function requireAuth() {
     return true;
 }
 
-function logout() {
-    clearUser();
+async function logout() {
     const supabase = getSupabase();
     if (supabase) {
-        supabase.auth.signOut();
+        await supabase.auth.signOut();
     }
+    clearUser();
     window.location.href = 'login.html';
 }
 

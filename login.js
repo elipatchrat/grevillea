@@ -1,42 +1,48 @@
 document.addEventListener('DOMContentLoaded', async function() {
     const supabase = getSupabase();
     
-    // Check for OAuth session (modern method using cookies/storage)
-    if (supabase) {
+    // Check for OAuth session - but only if we have a user in localStorage
+    // This prevents the login page from auto-redirecting when user explicitly navigates here
+    const existingUser = getUser();
+    
+    if (supabase && existingUser) {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (session?.user) {
             const userId = session.user.id;
             
-            // Check Supabase for profile
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
-            
-            // Check if onboarding completed
-            const onboardingCompleted = profile?.onboarding_completed === true || !!profile?.fullname;
-            const fullname = profile?.fullname || session.user.user_metadata?.full_name || session.user.user_metadata?.name || null;
-            
-            setUser({
-                id: userId,
-                email: session.user.email,
-                fullname: fullname,
-                username: profile?.username || null,
-                avatar: profile?.avatar || null,
-                role: profile?.role || null,
-                discovery: profile?.discovery_source || null,
-                onboarding: onboardingCompleted
-            });
-            
-            // Redirect based on onboarding status
-            if (onboardingCompleted) {
-                window.location.href = 'dashboard.html';
-            } else {
-                window.location.href = 'onboarding.html';
+            // Verify the session matches our stored user
+            if (existingUser.id === userId) {
+                // Check Supabase for profile
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                // Check if onboarding completed
+                const onboardingCompleted = profile?.onboarding_completed === true || !!profile?.fullname;
+                const fullname = profile?.fullname || session.user.user_metadata?.full_name || session.user.user_metadata?.name || null;
+                
+                setUser({
+                    id: userId,
+                    email: session.user.email,
+                    fullname: fullname,
+                    username: profile?.username || null,
+                    avatar: profile?.avatar || null,
+                    role: profile?.role || null,
+                    discovery: profile?.discovery_source || null,
+                    onboarding: onboardingCompleted
+                });
+                
+                // Redirect based on onboarding status
+                if (onboardingCompleted) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'onboarding.html';
+                }
+                return;
             }
-            return;
         }
     }
     
