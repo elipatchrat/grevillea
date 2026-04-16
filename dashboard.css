@@ -515,4 +515,20 @@
     .stats-grid {
         grid-template-columns: 1fr;
     }
+    
+    .features-preview {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.empty-state p {
+    margin: 0;
 }
