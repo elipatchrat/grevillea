@@ -1,43 +1,50 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    const supabase = getSupabase();
-    
-    // Handle OAuth redirect - check if user just came back from Google OAuth
-    // This only runs when there's a Supabase session but no localStorage user (fresh OAuth)
-    if (supabase && !isAuthenticated()) {
-        const { data: { session } } = await supabase.auth.getSession();
+    // Check if user just logged out - if so, clear flag and stay on login page
+    const justLoggedOut = sessionStorage.getItem('just_logged_out');
+    if (justLoggedOut) {
+        sessionStorage.removeItem('just_logged_out');
+        // Stay on login page, skip OAuth check
+    } else {
+        const supabase = getSupabase();
         
-        if (session?.user) {
-            const userId = session.user.id;
+        // Handle OAuth redirect - check if user just came back from Google OAuth
+        // This only runs when there's a Supabase session but no localStorage user (fresh OAuth)
+        if (supabase && !isAuthenticated()) {
+            const { data: { session } } = await supabase.auth.getSession();
             
-            // Check Supabase for profile
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
-            
-            // Check if onboarding completed
-            const onboardingCompleted = profile?.onboarding_completed === true || !!profile?.fullname;
-            const fullname = profile?.fullname || session.user.user_metadata?.full_name || session.user.user_metadata?.name || null;
-            
-            setUser({
-                id: userId,
-                email: session.user.email,
-                fullname: fullname,
-                username: profile?.username || null,
-                avatar: profile?.avatar || null,
-                role: profile?.role || null,
-                discovery: profile?.discovery_source || null,
-                onboarding: onboardingCompleted
-            });
-            
-            // Redirect based on onboarding status
-            if (onboardingCompleted) {
-                window.location.href = 'dashboard.html';
-            } else {
-                window.location.href = 'onboarding.html';
+            if (session?.user) {
+                const userId = session.user.id;
+                
+                // Check Supabase for profile
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                // Check if onboarding completed
+                const onboardingCompleted = profile?.onboarding_completed === true || !!profile?.fullname;
+                const fullname = profile?.fullname || session.user.user_metadata?.full_name || session.user.user_metadata?.name || null;
+                
+                setUser({
+                    id: userId,
+                    email: session.user.email,
+                    fullname: fullname,
+                    username: profile?.username || null,
+                    avatar: profile?.avatar || null,
+                    role: profile?.role || null,
+                    discovery: profile?.discovery_source || null,
+                    onboarding: onboardingCompleted
+                });
+                
+                // Redirect based on onboarding status
+                if (onboardingCompleted) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'onboarding.html';
+                }
+                return;
             }
-            return;
         }
     }
 

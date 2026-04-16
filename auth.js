@@ -28,12 +28,20 @@ function requireAuth() {
 }
 
 async function logout() {
+    // Set flag to prevent auto-redirect on login page
+    sessionStorage.setItem('just_logged_out', 'true');
+    
     const supabase = getSupabase();
     if (supabase) {
-        await supabase.auth.signOut();
+        try {
+            await supabase.auth.signOut({ scope: 'global' });
+        } catch (e) {
+            console.error('Sign out error:', e);
+        }
     }
     clearUser();
-    window.location.href = 'login.html';
+    // Force full page reload to clear any cached state
+    window.location.replace('login.html');
 }
 
 function updateUIForUser() {
