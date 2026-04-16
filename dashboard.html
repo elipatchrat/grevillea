@@ -169,21 +169,19 @@
                 <div class="dashboard-grid">
                     <div class="card tasks-card">
                         <div class="card-header">
-                            <h3>Today's Tasks</h3>
-                            <a href="#" class="link">View all</a>
+                            <h3>Tasks</h3>
+                            <span id="task-count-display">0 pending</span>
                         </div>
                         <div class="task-list" id="task-list">
                             <div class="empty-state">
-                                <p>No tasks yet. Add your first task to get started!</p>
+                                <p>No tasks yet. Add your first task below!</p>
                             </div>
                         </div>
-                        <button class="btn-add">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
-                            Add Task
-                        </button>
+                        <div class="task-input-row">
+                            <input type="text" id="new-task-input" placeholder="Enter task name..." class="task-input">
+                            <input type="text" id="new-task-date" placeholder="Due date (DD/MM/YY)" class="task-date-input" value="">
+                            <button id="add-task-btn" class="btn-add-inline">Add</button>
+                        </div>
                     </div>
 
                     <div class="card notes-card">

@@ -637,3 +637,147 @@
 .calendar-tasks .empty-state {
     padding: 20px;
 }
+
+/* Inline Task Input */
+.task-input-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.task-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.task-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.task-date-input {
+    width: 140px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.task-date-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn-add-inline {
+    padding: 10px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-add-inline:hover {
+    background: var(--primary-dark);
+}
+
+/* Editable Task Styles */
+.task-item {
+    position: relative;
+}
+
+.task-text-editable {
+    cursor: text;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.task-text-editable:hover {
+    background: var(--primary-light);
+}
+
+.task-text-editable.editing {
+    background: white;
+    border: 1px solid var(--primary);
+    outline: none;
+}
+
+.task-date-picker {
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--background);
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+.task-date-picker:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* Mini Calendar Popup */
+.mini-calendar-popup {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    padding: 16px;
+    z-index: 100;
+    width: 280px;
+}
+
+.mini-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.mini-calendar-header button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.mini-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.mini-calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.mini-calendar-day:hover {
+    background: var(--primary-light);
+}
+
+.mini-calendar-day.selected {
+    background: var(--primary);
+    color: white;
+}
+
+.mini-calendar-day.today {
+    border: 1px solid var(--primary);
+}
