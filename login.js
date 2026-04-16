@@ -10,22 +10,38 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Parse the JWT to get user info
             const payload = JSON.parse(atob(accessToken.split('.')[1]));
             
+            const fullname = payload.user_metadata?.full_name || payload.user_metadata?.name;
+            const isNewUser = payload.app_metadata?.provider === 'google' && !fullname;
+            
             setUser({
                 id: payload.sub,
                 email: payload.email,
-                fullname: payload.user_metadata?.full_name || payload.email.split('@')[0]
+                fullname: fullname || null,
+                onboarding: !!fullname // if we have name, onboarding is done
             });
             
-            // Clear hash and redirect to dashboard
+            // Clear hash and redirect
             window.location.hash = '';
-            window.location.href = 'dashboard.html';
+            
+            // Redirect based on onboarding status
+            if (fullname) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'onboarding.html';
+            }
             return;
         }
     }
     
     // Redirect if already logged in
     if (isAuthenticated()) {
-        window.location.href = 'dashboard.html';
+        const user = getUser();
+        // Check if onboarding is completed
+        if (user && user.onboarding === true) {
+            window.location.href = 'dashboard.html';
+        } else {
+            window.location.href = 'onboarding.html';
+        }
         return;
     }
 
@@ -96,10 +112,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                     .eq('id', data.user.id)
                     .single();
 
+                const fullname = profile?.fullname || null;
                 setUser({
                     id: data.user.id,
                     email: data.user.email,
-                    fullname: profile?.fullname || email.split('@')[0]
+                    fullname: fullname,
+                    onboarding: !!fullname
                 });
             } else {
                 // Demo mode - simulate login
@@ -116,12 +134,18 @@ document.addEventListener('DOMContentLoaded', async function() {
                 setUser({
                     id: user.id,
                     email: user.email,
-                    fullname: user.fullname
+                    fullname: user.fullname || null,
+                    onboarding: false
                 });
             }
 
-            // Redirect to dashboard
-            window.location.href = 'dashboard.html';
+            // Redirect based on onboarding status
+            const currentUser = getUser();
+            if (currentUser?.onboarding) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'onboarding.html';
+            }
 
         } catch (error) {
             submitBtn.disabled = false;

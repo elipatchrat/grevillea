@@ -9,8 +9,15 @@
     <link rel="stylesheet" href="auth.css">
     <script>
         // Auth protection - check before page renders
-        if (!localStorage.getItem('grevillea_user')) {
+        const userData = localStorage.getItem('grevillea_user');
+        if (!userData) {
             window.location.href = 'login.html';
+        } else {
+            const user = JSON.parse(userData);
+            // Check if onboarding is completed
+            if (!user.onboarding) {
+                window.location.href = 'onboarding.html';
+            }
         }
     </script>
 </head>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Grevillea</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="onboarding.css">
+    <script>
+        // Must be logged in and not completed onboarding
+        const user = localStorage.getItem('grevillea_user');
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            const userData = JSON.parse(user);
+            if (userData.onboarding === true && userData.fullname) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <div class="step-number">1</div>
+                <span>Profile</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="2">
+                <div class="step-number">2</div>
+                <span>Goals</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="3">
+                <div class="step-number">3</div>
+                <span>Ready</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Profile -->
+        <div class="onboarding-step active" id="step-1">
+            <div class="step-content">
+                <div class="brand">
+                    <div class="logo">G</div>
+                    <h1>Welcome to Grevillea!</h1>
+                    <p class="tagline">Let's set up your profile to get started.</p>
+                </div>
+
+                <form id="profile-form" class="onboarding-form">
+                    <div class="form-group">
+                        <label for="fullname">Full Name *</label>
+                        <input 
+                            type="text" 
+                            id="fullname" 
+                            name="fullname" 
+                            placeholder="Enter your full name"
+                            required
+                        >
+                        <span class="error-message" id="fullname-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username (optional)</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="Choose a username"
+                        >
+                    </div>
+
+                    <div class="avatar-selector">
+                        <label>Choose an Avatar</label>
+                        <div class="avatar-options">
+                            <button type="button" class="avatar-option active" data-avatar="🎓">🎓</button>
+                            <button type="button" class="avatar-option" data-avatar="📚">📚</button>
+                            <button type="button" class="avatar-option" data-avatar="✏️">✏️</button>
+                            <button type="button" class="avatar-option" data-avatar="📝">📝</button>
+                            <button type="button" class="avatar-option" data-avatar="🧠">🧠</button>
+                            <button type="button" class="avatar-option" data-avatar="🌟">🌟</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Continue</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 2: Study Goals -->
+        <div class="onboarding-step" id="step-2">
+            <div class="step-content">
+                <div class="brand">
+                    <div class="logo">G</div>
+                    <h1>Your Study Goals</h1>
+                    <p class="tagline">What do you want to achieve?</p>
+                </div>
+
+                <form id="goals-form" class="onboarding-form">
+                    <div class="form-group">
+                        <label>What are you studying? (Select all that apply)</label>
+                        <div class="study-tags">
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="math">
+                                <span>Mathematics</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="science">
+                                <span>Science</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="english">
+                                <span>English</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="history">
+                                <span>History</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="programming">
+                                <span>Programming</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="languages">
+                                <span>Languages</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="medicine">
+                                <span>Medicine</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="law">
+                                <span>Law</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="business">
+                                <span>Business</span>
+                            </label>
+                            <label class="study-tag">
+                                <input type="checkbox" name="subjects" value="art">
+                                <span>Art & Design</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="study-hours">How many hours do you study per week?</label>
+                        <select id="study-hours" name="study-hours">
+                            <option value="">Select hours...</option>
+                            <option value="0-5">0-5 hours</option>
+                            <option value="5-10">5-10 hours</option>
+                            <option value="10-20">10-20 hours</option>
+                            <option value="20-40">20-40 hours</option>
+                            <option value="40+">40+ hours</option>
+                        </select>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" class="btn-secondary" onclick="prevStep()">Back</button>
+                        <button type="submit" class="btn-primary">Continue</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 3: Ready -->
+        <div class="onboarding-step" id="step-3">
+            <div class="step-content">
+                <div class="success-icon large"></div>
+                <h1>You're All Set!</h1>
+                <p class="tagline">Your profile is ready. Start organizing your studies now.</p>
+
+                <div class="features-preview">
+                    <div class="feature-item">
+                        <div class="feature-icon">📚</div>
+                        <span>Create study notes</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">⏱️</div>
+                        <span>Track study time</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📅</div>
+                        <span>Manage your schedule</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">✅</div>
+                        <span>Set and achieve goals</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary btn-large" onclick="finishOnboarding()">Go to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="onboarding.js"></script>
+</body>
+</html>

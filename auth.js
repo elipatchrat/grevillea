@@ -40,10 +40,20 @@ function updateUIForUser() {
     const user = getUser();
     if (!user) return;
     
-    // Update avatar with initials
+    // Update avatar with initials or emoji
     const avatar = document.getElementById('user-avatar') || document.querySelector('.avatar');
-    if (avatar && user.fullname) {
-        const initials = user.fullname.split(' ').map(n => n[0]).join('').toUpperCase();
-        avatar.textContent = initials.slice(0, 2);
+    if (avatar) {
+        if (user.avatar) {
+            // Use emoji avatar if set
+            avatar.textContent = user.avatar;
+            avatar.style.fontSize = '24px';
+        } else if (user.fullname) {
+            // Use initials from fullname
+            const initials = user.fullname.split(' ').map(n => n[0]).join('').toUpperCase();
+            avatar.textContent = initials.slice(0, 2);
+        } else {
+            // Default initial from email
+            avatar.textContent = user.email ? user.email[0].toUpperCase() : '?';
+        }
     }
 }

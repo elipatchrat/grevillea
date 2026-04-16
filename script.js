@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const form = document.getElementById('signup-form');
     const inputs = {
-        fullname: document.getElementById('fullname'),
         email: document.getElementById('email'),
         password: document.getElementById('password'),
         confirmPassword: document.getElementById('confirm-password'),
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const errors = {
-        fullname: document.getElementById('fullname-error'),
         email: document.getElementById('email-error'),
         password: document.getElementById('password-error'),
         confirmPassword: document.getElementById('confirm-password-error'),
@@ -46,11 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let isValid = true;
         clearAllErrors();
 
-        if (inputs.fullname.value.trim().length < 2) {
-            showError('fullname', 'Please enter your full name');
-            isValid = false;
-        }
-
         if (!validateEmail(inputs.email.value)) {
             showError('email', 'Please enter a valid email address');
             isValid = false;
@@ -75,14 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Real-time validation
-    inputs.fullname.addEventListener('blur', () => {
-        if (inputs.fullname.value.trim().length > 0 && inputs.fullname.value.trim().length < 2) {
-            showError('fullname', 'Please enter your full name');
-        } else {
-            clearError('fullname');
-        }
-    });
-
     inputs.email.addEventListener('blur', () => {
         if (inputs.email.value && !validateEmail(inputs.email.value)) {
             showError('email', 'Please enter a valid email address');
@@ -125,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.textContent = 'Creating Account...';
 
         try {
-            const fullname = inputs.fullname.value.trim();
             const email = inputs.email.value.trim();
             const password = inputs.password.value;
 
@@ -138,31 +122,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     password: password,
                     options: {
                         data: {
-                            fullname: fullname
+                            onboarding: false
                         }
                     }
                 });
 
                 if (error) throw error;
 
-                // Create profile in database
-                const { error: profileError } = await supabase
-                    .from('profiles')
-                    .insert([{
-                        id: data.user.id,
-                        fullname: fullname,
-                        email: email,
-                        created_at: new Date().toISOString()
-                    }]);
-
-                if (profileError) {
-                    console.error('Profile creation error:', profileError);
-                }
-
+                // Profile will be created in onboarding
                 setUser({
                     id: data.user.id,
                     email: data.user.email,
-                    fullname: fullname
+                    fullname: null,
+                    onboarding: false
                 });
             } else {
                 // Demo mode - store in localStorage
@@ -177,7 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const newUser = {
                     id: 'demo_' + Date.now(),
                     email: email,
-                    fullname: fullname,
                     password: password
                 };
 
@@ -187,7 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 setUser({
                     id: newUser.id,
                     email: email,
-                    fullname: fullname
+                    fullname: null,
+                    onboarding: false
                 });
             }
 
@@ -196,16 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.divider').style.display = 'none';
             document.querySelector('.social-login').style.display = 'none';
             
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-message visible';
-            successDiv.innerHTML = `
-                <div class="success-icon"></div>
-                <h2>Welcome to Grevillea!</h2>
-                <p>Your account has been created successfully. ${supabase ? 'Check your email to verify your account.' : ''}</p>
-                <button class="btn-primary" onclick="window.location.href='dashboard.html'">Continue to Dashboard</button>
-            `;
+            // Redirect to onboarding to complete profile
+            window.location.href = 'onboarding.html';
             
-            document.querySelector('.signup-card').appendChild(successDiv);
+            return;
 
         } catch (error) {
             submitBtn.disabled = false;
@@ -230,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: 'https://grevillea.app/dashboard.html'
+                    redirectTo: 'https://grevillea.app/onboarding.html'
                 }
             });
             if (error) alert('Google sign up failed: ' + error.message);
