@@ -96,48 +96,32 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const supabase = getSupabase();
             
-            if (supabase) {
-                // Try Supabase auth
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (error) throw error;
-
-                // Get user profile
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', data.user.id)
-                    .single();
-
-                const fullname = profile?.fullname || null;
-                setUser({
-                    id: data.user.id,
-                    email: data.user.email,
-                    fullname: fullname,
-                    onboarding: !!fullname
-                });
-            } else {
-                // Demo mode - simulate login
-                await new Promise(r => setTimeout(r, 1000));
-                
-                // Check for demo user
-                const demoUsers = JSON.parse(localStorage.getItem('demo_users') || '[]');
-                const user = demoUsers.find(u => u.email === email);
-                
-                if (!user || user.password !== password) {
-                    throw new Error('Invalid email or password');
-                }
-
-                setUser({
-                    id: user.id,
-                    email: user.email,
-                    fullname: user.fullname || null,
-                    onboarding: false
-                });
+            if (!supabase) {
+                throw new Error('Unable to connect to authentication service. Please try again.');
             }
+
+            // Try Supabase auth
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) throw error;
+
+            // Get user profile
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', data.user.id)
+                .single();
+
+            const fullname = profile?.fullname || null;
+            setUser({
+                id: data.user.id,
+                email: data.user.email,
+                fullname: fullname,
+                onboarding: !!fullname
+            });
 
             // Redirect based on onboarding status
             const currentUser = getUser();
