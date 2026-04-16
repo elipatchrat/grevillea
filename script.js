@@ -115,53 +115,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const supabase = getSupabase();
 
-            if (supabase) {
-                // Supabase signup
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            onboarding: false
-                        }
-                    }
-                });
-
-                if (error) throw error;
-
-                // Profile will be created in onboarding
-                setUser({
-                    id: data.user.id,
-                    email: data.user.email,
-                    fullname: null,
-                    onboarding: false
-                });
-            } else {
-                // Demo mode - store in localStorage
-                await new Promise(r => setTimeout(r, 1000));
-                
-                const demoUsers = JSON.parse(localStorage.getItem('demo_users') || '[]');
-                
-                if (demoUsers.find(u => u.email === email)) {
-                    throw new Error('An account with this email already exists');
-                }
-
-                const newUser = {
-                    id: 'demo_' + Date.now(),
-                    email: email,
-                    password: password
-                };
-
-                demoUsers.push(newUser);
-                localStorage.setItem('demo_users', JSON.stringify(demoUsers));
-
-                setUser({
-                    id: newUser.id,
-                    email: email,
-                    fullname: null,
-                    onboarding: false
-                });
+            if (!supabase) {
+                throw new Error('Unable to connect to authentication service. Please try again.');
             }
+
+            // Supabase signup
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        onboarding: false
+                    }
+                }
+            });
+
+            if (error) throw error;
+
+            // Profile will be created in onboarding
+            setUser({
+                id: data.user.id,
+                email: data.user.email,
+                fullname: null,
+                onboarding: false
+            });
 
             // Show success
             form.style.display = 'none';
