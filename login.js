@@ -1,34 +1,27 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    // Handle OAuth callback (tokens in URL hash)
-    const hash = window.location.hash;
-    if (hash && hash.includes('access_token')) {
-        const params = new URLSearchParams(hash.substring(1));
-        const accessToken = params.get('access_token');
+    const supabase = getSupabase();
+    
+    // Check for OAuth session (modern method using cookies/storage)
+    if (supabase) {
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (accessToken) {
-            // Parse the JWT to get user info
-            const payload = JSON.parse(atob(accessToken.split('.')[1]));
-            const userId = payload.sub;
+        if (session?.user) {
+            const userId = session.user.id;
             
             // Check Supabase for profile
-            const supabase = getSupabase();
-            let profile = null;
-            if (supabase) {
-                const { data } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single();
-                profile = data;
-            }
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
             
             // Check if onboarding completed
             const onboardingCompleted = profile?.onboarding_completed === true || !!profile?.fullname;
-            const fullname = profile?.fullname || payload.user_metadata?.full_name || payload.user_metadata?.name || null;
+            const fullname = profile?.fullname || session.user.user_metadata?.full_name || session.user.user_metadata?.name || null;
             
             setUser({
                 id: userId,
-                email: payload.email,
+                email: session.user.email,
                 fullname: fullname,
                 username: profile?.username || null,
                 avatar: profile?.avatar || null,
@@ -36,9 +29,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 discovery: profile?.discovery_source || null,
                 onboarding: onboardingCompleted
             });
-            
-            // Clear hash and redirect
-            window.location.hash = '';
             
             // Redirect based on onboarding status
             if (onboardingCompleted) {
