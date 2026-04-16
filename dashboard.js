@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load user data and update UI
     loadUserData();
     
-    // Generate calendar week view
-    generateWeekView();
+    // Generate full month calendar
+    generateCalendar();
     
     // Task management
     let tasks = JSON.parse(localStorage.getItem('grevillea_tasks') || '[]');
@@ -59,14 +59,19 @@ document.addEventListener('DOMContentLoaded', function() {
         addTaskBtn.addEventListener('click', function() {
             const taskText = prompt('Enter task name:');
             if (taskText && taskText.trim()) {
+                const dateInput = prompt('Due date (YYYY-MM-DD) or leave empty for today:', selectedDate);
+                const taskDate = dateInput && dateInput.match(/^\d{4}-\d{2}-\d{2}$/) ? dateInput : selectedDate;
+                
                 tasks.push({
                     text: taskText.trim(),
                     completed: false,
                     tag: 'General',
+                    date: taskDate,
                     createdAt: new Date().toISOString()
                 });
                 saveTasks();
                 renderTasks();
+                generateCalendar();
             }
         });
     }
@@ -223,43 +228,126 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Calendar functionality
-    function generateWeekView() {
-        const weekView = document.getElementById('week-view');
-        if (!weekView) return;
+    let currentCalendarDate = new Date();
+    let selectedDate = new Date().toISOString().split('T')[0];
+    
+    function generateCalendar() {
+        const calendarDays = document.getElementById('calendar-days');
+        const calendarMonth = document.getElementById('calendar-month');
+        if (!calendarDays || !calendarMonth) return;
         
-        const today = new Date();
-        const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday
-        const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1); // Adjust to get Monday
-        const monday = new Date(today.setDate(diff));
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
         
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+        // Update month title
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+        calendarMonth.textContent = `${monthNames[month]} ${year}`;
         
-        weekView.innerHTML = days.map((day, index) => {
-            const date = new Date(monday);
-            date.setDate(monday.getDate() + index);
-            const dayNumber = date.getDate();
-            const isToday = index === todayIndex;
+        // Get first day of month and total days
+        const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+        
+        const today = new Date().toISOString().split('T')[0];
+        
+        let html = '';
+        
+        // Previous month days
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const day = daysInPrevMonth - i;
+            html += `<div class="calendar-day other-month"><span class="calendar-day-number">${day}</span></div>`;
+        }
+        
+        // Current month days
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = dateStr === today;
+            const isSelected = dateStr === selectedDate;
             
-            return `
-                <div class="day-column ${isToday ? 'active' : ''}" data-date="${date.toISOString().split('T')[0]}">
-                    <span class="day-label">${day}</span>
-                    <span class="day-number">${dayNumber}</span>
-                    <div class="day-dot ${isToday ? 'active' : ''}"></div>
+            // Get tasks for this date
+            const dayTasks = tasks.filter(t => t.date === dateStr && !t.completed);
+            const taskDots = dayTasks.map(() => '<div class="task-dot"></div>').join('');
+            
+            html += `
+                <div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" data-date="${dateStr}">
+                    <span class="calendar-day-number">${day}</span>
+                    <div class="calendar-day-tasks">${taskDots}</div>
                 </div>
             `;
-        }).join('');
+        }
+        
+        // Next month days to fill grid (6 rows x 7 cols = 42 cells)
+        const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+        const remainingCells = totalCells - (firstDay + daysInMonth);
+        
+        for (let day = 1; day <= remainingCells; day++) {
+            html += `<div class="calendar-day other-month"><span class="calendar-day-number">${day}</span></div>`;
+        }
+        
+        calendarDays.innerHTML = html;
         
         // Add click handlers
-        weekView.querySelectorAll('.day-column').forEach(day => {
+        calendarDays.querySelectorAll('.calendar-day:not(.other-month)').forEach(day => {
             day.addEventListener('click', function() {
-                weekView.querySelectorAll('.day-column').forEach(d => d.classList.remove('active'));
-                weekView.querySelectorAll('.day-dot').forEach(d => d.classList.remove('active'));
-                this.classList.add('active');
-                this.querySelector('.day-dot').classList.add('active');
+                selectedDate = this.dataset.date;
+                generateCalendar();
+                showTasksForDate(selectedDate);
             });
         });
+        
+        showTasksForDate(selectedDate);
     }
+    
+    function showTasksForDate(dateStr) {
+        const dayTasksList = document.getElementById('day-tasks-list');
+        const selectedDateSpan = document.getElementById('selected-date');
+        if (!dayTasksList || !selectedDateSpan) return;
+        
+        selectedDateSpan.textContent = new Date(dateStr).toLocaleDateString('en-US', { 
+            weekday: 'short', month: 'short', day: 'numeric' 
+        });
+        
+        const dayTasks = tasks.filter(t => t.date === dateStr);
+        
+        if (dayTasks.length === 0) {
+            dayTasksList.innerHTML = `
+                <div class="empty-state">
+                    <p>No tasks for this date.</p>
+                </div>
+            `;
+        } else {
+            dayTasksList.innerHTML = dayTasks.map((task, index) => `
+                <label class="task-item">
+                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} data-index="${tasks.indexOf(task)}">
+                    <span class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(task.text)}</span>
+                    <span class="task-tag">${task.completed ? 'Done' : 'Pending'}</span>
+                </label>
+            `).join('');
+            
+            dayTasksList.querySelectorAll('.task-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const taskIndex = parseInt(this.dataset.index);
+                    tasks[taskIndex].completed = this.checked;
+                    saveTasks();
+                    generateCalendar();
+                    renderTasks();
+                    showTasksForDate(selectedDate);
+                });
+            });
+        }
+    }
+    
+    // Month navigation
+    document.getElementById('prev-month')?.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        generateCalendar();
+    });
+    
+    document.getElementById('next-month')?.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        generateCalendar();
+    });
     
     // Load user data
     function loadUserData() {
