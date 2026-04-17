@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="task-text-editable ${task.completed ? 'completed' : ''}">${escapeHtml(task.text)}</span>
                     <span class="task-date-picker" data-index="${index}">${formatDisplayDate(task.date)}</span>
                     <span class="task-tag">${task.completed ? 'Done' : 'Pending'}</span>
+                    <button class="task-delete" data-index="${index}" title="Delete task">×</button>
                 </div>
             `).join('');
             
@@ -183,6 +184,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     showMiniCalendarForTask(index, this);
                 });
             });
+            
+            taskList.querySelectorAll('.task-delete').forEach(delBtn => {
+                delBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const index = parseInt(this.dataset.index);
+                    if (confirm('Delete this task?')) {
+                        tasks.splice(index, 1);
+                        saveTasks();
+                        renderTasks();
+                        generateCalendar();
+                        showTasksForDate(selectedDate);
+                    }
+                });
+            });
         }
         updateStats();
     }
@@ -227,9 +242,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = `
             <div class="mini-calendar-header">
-                <button id="mini-prev">&lt;</button>
+                <button class="mini-prev">&lt;</button>
                 <span>${monthNames[month]} ${year}</span>
-                <button id="mini-next">&gt;</button>
+                <button class="mini-next">&gt;</button>
             </div>
             <div class="mini-calendar-grid">
         `;
@@ -246,13 +261,13 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '</div>';
         container.innerHTML = html;
         
-        container.querySelector('#mini-prev').addEventListener('click', (e) => {
+        container.querySelector('.mini-prev').addEventListener('click', (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
             renderMiniCalendarForTask(container, taskIndex);
         });
         
-        container.querySelector('#mini-next').addEventListener('click', (e) => {
+        container.querySelector('.mini-next').addEventListener('click', (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
             renderMiniCalendarForTask(container, taskIndex);
@@ -427,9 +442,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = `
             <div class="mini-calendar-header">
-                <button id="mini-prev">&lt;</button>
+                <button class="mini-prev">&lt;</button>
                 <span>${monthNames[month]} ${year}</span>
-                <button id="mini-next">&gt;</button>
+                <button class="mini-next">&gt;</button>
             </div>
             <div class="mini-calendar-grid">
         `;
@@ -447,13 +462,13 @@ document.addEventListener('DOMContentLoaded', function() {
         popup.innerHTML = html;
         document.body.appendChild(popup);
         
-        popup.querySelector('#mini-prev').addEventListener('click', (e) => {
+        popup.querySelector('.mini-prev').addEventListener('click', (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
             showMiniCalendar(targetInput);
         });
         
-        popup.querySelector('#mini-next').addEventListener('click', (e) => {
+        popup.querySelector('.mini-next').addEventListener('click', (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
             showMiniCalendar(targetInput);
