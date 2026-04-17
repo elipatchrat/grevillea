@@ -473,21 +473,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const prevBtn = popup.querySelector('.mini-prev');
         const nextBtn = popup.querySelector('.mini-next');
         
+        console.log('Buttons found:', prevBtn, nextBtn);
+        
         if (prevBtn) {
-            prevBtn.onclick = (e) => {
+            prevBtn.onmousedown = (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 console.log('Input prev clicked');
                 currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
                 renderMiniCalendarInput(popup, targetInput);
+                return false;
             };
         }
         
         if (nextBtn) {
-            nextBtn.onclick = (e) => {
+            nextBtn.onmousedown = (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 console.log('Input next clicked');
                 currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
                 renderMiniCalendarInput(popup, targetInput);
+                return false;
             };
         }
         
@@ -513,7 +519,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function showMiniCalendar(targetInput) {
         const existing = document.querySelector('.mini-calendar-popup');
-        if (existing) existing.remove();
+        if (existing) {
+            existing.remove();
+            document.removeEventListener('click', outsideClickHandlerInput);
+        }
         
         miniCalendarTarget = targetInput;
         currentMiniCalendarDate = new Date();
@@ -531,9 +540,10 @@ document.addEventListener('DOMContentLoaded', function() {
         renderMiniCalendarInput(popup, targetInput);
         document.body.appendChild(popup);
         
+        // Delay adding the outside click handler so clicks on the popup don't close it
         setTimeout(() => {
             document.addEventListener('click', outsideClickHandlerInput);
-        }, 100);
+        }, 200);
     }
     
     // INITIALIZE
