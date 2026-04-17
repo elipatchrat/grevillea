@@ -243,17 +243,51 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="supabase-config.js"></script>
-    <script src="auth.js"></script>
-    <script src="dashboard.js"></script>
-    <script>
-        // Handle OAuth redirect and sync session
-        document.addEventListener('DOMContentLoaded', async function() {
-            const supabase = getSupabase();
+            <!-- Notes Section -->
+            <section class="notes-section" id="notes-section">
+                <div class="container">
+                    <h2 class="section-title">Notes</h2>
+                    <div class="notes-layout">
+                        <!-- Sidebar -->
+                        <div class="notes-sidebar">
+                            <div class="notes-sidebar-header">
+                                <h3>My Notes</h3>
+                                <button class="btn-add-note" id="btn-add-note">+ New Note</button>
+                            </div>
+                            <div class="notes-sidebar-list" id="notes-sidebar-list">
+                                <!-- Notes list populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Editor -->
+                        <div class="notes-editor">
+                            <div class="notes-editor-header">
+                                <input type="text" class="note-title-input" id="note-title-input" placeholder="Note Title">
+                                <div class="note-meta">
+                                    <input type="text" class="note-category-input" id="note-category-input" placeholder="Category">
+                                    <span class="note-date" id="note-date"></span>
+                                </div>
+                            </div>
+                            <textarea class="note-content" id="note-content" placeholder="Start writing your note here..."></textarea>
+                            <div class="notes-editor-footer">
+                                <button class="btn-save-note" id="btn-save-note">Save Note</button>
+                                <button class="btn-delete-note" id="btn-delete-note">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+        <script src="supabase-config.js"></script>
+        <script src="auth.js"></script>
+        <script src="dashboard.js"></script>
+        <script>
+            // Handle OAuth redirect and sync session
+            document.addEventListener('DOMContentLoaded', async function() {
+                const supabase = getSupabase();
             
             // If coming from OAuth, sync the session
             if (supabase) {

@@ -543,12 +543,208 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 200);
     }
     
+    // NOTES FUNCTIONALITY
+    let notes = JSON.parse(localStorage.getItem('grevillea_notes') || '[]');
+    let currentNoteId = null;
+    let expandedNotes = new Set();
+    
+    function saveNotes() {
+        localStorage.setItem('grevillea_notes', JSON.stringify(notes));
+        updateNotesCount();
+    }
+    
+    function updateNotesCount() {
+        const notesCount = document.getElementById('notes-count');
+        if (notesCount) notesCount.textContent = notes.length;
+    }
+    
+    function formatNoteDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    
+    function renderNotesList() {
+        const sidebarList = document.getElementById('notes-sidebar-list');
+        const recentNotesList = document.getElementById('notes-list');
+        
+        // Sidebar list
+        if (sidebarList) {
+            if (notes.length === 0) {
+                sidebarList.innerHTML = '<div class="empty-state"><p>No notes yet</p></div>';
+            } else {
+                sidebarList.innerHTML = notes.map((note, index) => {
+                    const isExpanded = expandedNotes.has(note.id);
+                    const preview = isExpanded ? note.content : (note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''));
+                    return `
+                        <div class="note-item ${note.id === currentNoteId ? 'active' : ''}" data-id="${note.id}">
+                            <div class="note-item-header">
+                                <span class="note-item-title">${escapeHtml(note.title || 'Untitled')}</span>
+                                <span class="note-item-category">${escapeHtml(note.category || 'General')}</span>
+                                <button class="note-item-expand" data-id="${note.id}">${isExpanded ? '▲' : '▼'}</button>
+                            </div>
+                            <div class="note-item-preview">${escapeHtml(preview)}</div>
+                            <div class="note-item-date">${formatNoteDate(note.updatedAt || note.createdAt)}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Click to select note
+                sidebarList.querySelectorAll('.note-item').forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        if (!e.target.classList.contains('note-item-expand')) {
+                            const noteId = this.dataset.id;
+                            loadNote(noteId);
+                        }
+                    });
+                });
+                
+                // Expand/collapse button
+                sidebarList.querySelectorAll('.note-item-expand').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const noteId = this.dataset.id;
+                        if (expandedNotes.has(noteId)) {
+                            expandedNotes.delete(noteId);
+                        } else {
+                            expandedNotes.add(noteId);
+                        }
+                        renderNotesList();
+                    });
+                });
+            }
+        }
+        
+        // Recent notes (dashboard card)
+        if (recentNotesList) {
+            const recentNotes = notes.slice(-3).reverse();
+            if (recentNotes.length === 0) {
+                recentNotesList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No notes yet. Create your first study note!</p>
+                    </div>
+                `;
+            } else {
+                recentNotesList.innerHTML = recentNotes.map(note => `
+                    <div class="note-preview-item" data-id="${note.id}">
+                        <div class="note-preview-title">${escapeHtml(note.title || 'Untitled')}</div>
+                        <div class="note-preview-category">${escapeHtml(note.category || 'General')}</div>
+                    </div>
+                `).join('');
+                
+                recentNotesList.querySelectorAll('.note-preview-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const noteId = this.dataset.id;
+                        scrollToNotes();
+                        loadNote(noteId);
+                    });
+                });
+            }
+        }
+    }
+    
+    function loadNote(noteId) {
+        const note = notes.find(n => n.id === noteId);
+        if (!note) return;
+        
+        currentNoteId = noteId;
+        
+        const titleInput = document.getElementById('note-title-input');
+        const categoryInput = document.getElementById('note-category-input');
+        const dateSpan = document.getElementById('note-date');
+        const contentTextarea = document.getElementById('note-content');
+        
+        if (titleInput) titleInput.value = note.title || '';
+        if (categoryInput) categoryInput.value = note.category || '';
+        if (dateSpan) dateSpan.textContent = 'Last edited: ' + formatNoteDate(note.updatedAt || note.createdAt);
+        if (contentTextarea) contentTextarea.value = note.content || '';
+        
+        renderNotesList(); // Update active state
+    }
+    
+    function createNewNote() {
+        const newNote = {
+            id: Date.now().toString(),
+            title: '',
+            category: '',
+            content: '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        notes.push(newNote);
+        saveNotes();
+        renderNotesList();
+        loadNote(newNote.id);
+        
+        // Focus title
+        const titleInput = document.getElementById('note-title-input');
+        if (titleInput) titleInput.focus();
+    }
+    
+    function saveCurrentNote() {
+        if (!currentNoteId) return;
+        
+        const titleInput = document.getElementById('note-title-input');
+        const categoryInput = document.getElementById('note-category-input');
+        const contentTextarea = document.getElementById('note-content');
+        
+        const note = notes.find(n => n.id === currentNoteId);
+        if (note) {
+            note.title = titleInput ? titleInput.value : '';
+            note.category = categoryInput ? categoryInput.value : '';
+            note.content = contentTextarea ? contentTextarea.value : '';
+            note.updatedAt = new Date().toISOString();
+            
+            saveNotes();
+            renderNotesList();
+            
+            // Show saved indicator
+            const saveBtn = document.getElementById('btn-save-note');
+            if (saveBtn) {
+                const originalText = saveBtn.textContent;
+                saveBtn.textContent = 'Saved!';
+                setTimeout(() => saveBtn.textContent = originalText, 1500);
+            }
+        }
+    }
+    
+    function deleteCurrentNote() {
+        if (!currentNoteId) return;
+        
+        if (confirm('Delete this note?')) {
+            notes = notes.filter(n => n.id !== currentNoteId);
+            saveNotes();
+            
+            currentNoteId = null;
+            
+            // Clear editor
+            const titleInput = document.getElementById('note-title-input');
+            const categoryInput = document.getElementById('note-category-input');
+            const contentTextarea = document.getElementById('note-content');
+            
+            if (titleInput) titleInput.value = '';
+            if (categoryInput) categoryInput.value = '';
+            if (contentTextarea) contentTextarea.value = '';
+            
+            renderNotesList();
+        }
+    }
+    
+    function scrollToNotes() {
+        const notesSection = document.getElementById('notes-section');
+        if (notesSection) {
+            notesSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    
     // INITIALIZE
     loadUserData();
     generateCalendar();
     renderTasks();
     updateTimerDisplay();
     updateStudyTimeDisplay();
+    renderNotesList();
+    updateNotesCount();
     
     // Setup event listeners
     const addTaskBtnInline = document.getElementById('add-task-btn');
@@ -585,4 +781,36 @@ document.addEventListener('DOMContentLoaded', function() {
         currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
         generateCalendar();
     });
+    
+    // Notes event listeners
+    const btnAddNote = document.getElementById('btn-add-note');
+    const btnSaveNote = document.getElementById('btn-save-note');
+    const btnDeleteNote = document.getElementById('btn-delete-note');
+    
+    if (btnAddNote) btnAddNote.addEventListener('click', createNewNote);
+    if (btnSaveNote) btnSaveNote.addEventListener('click', saveCurrentNote);
+    if (btnDeleteNote) btnDeleteNote.addEventListener('click', deleteCurrentNote);
+    
+    // Auto-save on input change
+    const noteTitleInput = document.getElementById('note-title-input');
+    const noteCategoryInput = document.getElementById('note-category-input');
+    const noteContent = document.getElementById('note-content');
+    
+    if (noteTitleInput) {
+        noteTitleInput.addEventListener('input', () => {
+            if (currentNoteId) saveCurrentNote();
+        });
+    }
+    
+    if (noteCategoryInput) {
+        noteCategoryInput.addEventListener('input', () => {
+            if (currentNoteId) saveCurrentNote();
+        });
+    }
+    
+    if (noteContent) {
+        noteContent.addEventListener('input', () => {
+            if (currentNoteId) saveCurrentNote();
+        });
+    }
 });
