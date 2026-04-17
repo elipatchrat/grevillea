@@ -211,6 +211,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const existing = document.querySelector('.mini-calendar-popup');
         if (existing) existing.remove();
         
+        // Reset to current month when opening
+        currentMiniCalendarDate = new Date();
+        
         const popup = document.createElement('div');
         popup.className = 'mini-calendar-popup';
         popup.id = 'mini-calendar-popup';
@@ -224,9 +227,18 @@ document.addEventListener('DOMContentLoaded', function() {
         renderMiniCalendarForTask(popup, taskIndex);
         document.body.appendChild(popup);
         
+        // Attach outside click handler
         setTimeout(() => {
-            document.addEventListener('click', closeMiniCalendar, { once: true });
+            document.addEventListener('click', outsideClickHandler);
         }, 100);
+    }
+    
+    function outsideClickHandler(e) {
+        const popup = document.getElementById('mini-calendar-popup');
+        if (popup && !popup.contains(e.target)) {
+            closeMiniCalendar();
+            document.removeEventListener('click', outsideClickHandler);
+        }
     }
     
     function renderMiniCalendarForTask(container, taskIndex) {
@@ -261,17 +273,21 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '</div>';
         container.innerHTML = html;
         
-        container.querySelector('.mini-prev').addEventListener('click', (e) => {
+        // Use onclick instead of addEventListener to avoid accumulation
+        const prevBtn = container.querySelector('.mini-prev');
+        const nextBtn = container.querySelector('.mini-next');
+        
+        prevBtn.onclick = (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
             renderMiniCalendarForTask(container, taskIndex);
-        });
+        };
         
-        container.querySelector('.mini-next').addEventListener('click', (e) => {
+        nextBtn.onclick = (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
             renderMiniCalendarForTask(container, taskIndex);
-        });
+        };
         
         container.querySelectorAll('.mini-calendar-day').forEach(day => {
             day.addEventListener('click', (e) => {
@@ -281,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderTasks();
                 generateCalendar();
                 closeMiniCalendar();
+                document.removeEventListener('click', outsideClickHandler);
             });
         });
     }
@@ -413,23 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
         newTaskInput.focus();
     }
     
-    function showMiniCalendar(targetInput) {
-        const existing = document.querySelector('.mini-calendar-popup');
-        if (existing) existing.remove();
-        
-        miniCalendarTarget = targetInput;
-        currentMiniCalendarDate = new Date();
-        
-        const popup = document.createElement('div');
-        popup.className = 'mini-calendar-popup';
-        popup.id = 'mini-calendar-popup';
-        popup.style.position = 'fixed';
-        popup.style.zIndex = '1000';
-        
-        const rect = targetInput.getBoundingClientRect();
-        popup.style.left = rect.left + 'px';
-        popup.style.top = (rect.bottom + 8) + 'px';
-        
+    function renderMiniCalendarInput(popup, targetInput) {
         const year = currentMiniCalendarDate.getFullYear();
         const month = currentMiniCalendarDate.getMonth();
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -460,32 +461,61 @@ document.addEventListener('DOMContentLoaded', function() {
         
         html += '</div>';
         popup.innerHTML = html;
-        document.body.appendChild(popup);
         
-        popup.querySelector('.mini-prev').addEventListener('click', (e) => {
+        popup.querySelector('.mini-prev').onclick = (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
-            showMiniCalendar(targetInput);
-        });
+            renderMiniCalendarInput(popup, targetInput);
+        };
         
-        popup.querySelector('.mini-next').addEventListener('click', (e) => {
+        popup.querySelector('.mini-next').onclick = (e) => {
             e.stopPropagation();
             currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
-            showMiniCalendar(targetInput);
-        });
+            renderMiniCalendarInput(popup, targetInput);
+        };
         
         popup.querySelectorAll('.mini-calendar-day').forEach(day => {
-            day.addEventListener('click', (e) => {
+            day.onclick = (e) => {
                 e.stopPropagation();
                 const dateStr = day.dataset.date;
                 const [y, m, d] = dateStr.split('-');
                 targetInput.value = `${d}/${m}/${y.slice(-2)}`;
                 closeMiniCalendar();
-            });
+                document.removeEventListener('click', outsideClickHandlerInput);
+            };
         });
+    }
+    
+    function outsideClickHandlerInput(e) {
+        const popup = document.getElementById('mini-calendar-popup');
+        if (popup && !popup.contains(e.target)) {
+            closeMiniCalendar();
+            document.removeEventListener('click', outsideClickHandlerInput);
+        }
+    }
+    
+    function showMiniCalendar(targetInput) {
+        const existing = document.querySelector('.mini-calendar-popup');
+        if (existing) existing.remove();
+        
+        miniCalendarTarget = targetInput;
+        currentMiniCalendarDate = new Date();
+        
+        const popup = document.createElement('div');
+        popup.className = 'mini-calendar-popup';
+        popup.id = 'mini-calendar-popup';
+        popup.style.position = 'fixed';
+        popup.style.zIndex = '1000';
+        
+        const rect = targetInput.getBoundingClientRect();
+        popup.style.left = rect.left + 'px';
+        popup.style.top = (rect.bottom + 8) + 'px';
+        
+        renderMiniCalendarInput(popup, targetInput);
+        document.body.appendChild(popup);
         
         setTimeout(() => {
-            document.addEventListener('click', closeMiniCalendar, { once: true });
+            document.addEventListener('click', outsideClickHandlerInput);
         }, 100);
     }
     
