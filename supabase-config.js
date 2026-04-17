@@ -1,6 +1,33 @@
 // SQL Schema:
 // create table profiles (id uuid primary key, fullname text, username text, avatar text, role text, discovery_source text, onboarding_completed boolean, created_at timestamptz, updated_at timestamptz);
 // alter table profiles enable row level security;
+//
+// -- Tasks table
+// create table tasks (
+//   id uuid default gen_random_uuid() primary key,
+//   user_id uuid references auth.users(id) on delete cascade,
+//   text text not null,
+//   completed boolean default false,
+//   tag text default 'General',
+//   date text,
+//   created_at timestamptz default now(),
+//   updated_at timestamptz default now()
+// );
+// alter table tasks enable row level security;
+// create policy "Users can only access their own tasks" on tasks for all using (auth.uid() = user_id);
+//
+// -- Notes table
+// create table notes (
+//   id uuid default gen_random_uuid() primary key,
+//   user_id uuid references auth.users(id) on delete cascade,
+//   title text,
+//   category text default 'General',
+//   content text,
+//   created_at timestamptz default now(),
+//   updated_at timestamptz default now()
+// );
+// alter table notes enable row level security;
+// create policy "Users can only access their own notes" on notes for all using (auth.uid() = user_id);
 
 const SUPABASE_URL = 'https://asylgnxgjyubixorsfmg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzeWxnbnhnanl1Yml4b3JzZm1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNDA0MjUsImV4cCI6MjA5MTgxNjQyNX0.gRFw2KL8yUtJ74OUUcUKREKAj1DoXep_gmwr5ZfOYOI';

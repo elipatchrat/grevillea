@@ -1,6 +1,7 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Initialize all variables first
-    let tasks = JSON.parse(localStorage.getItem('grevillea_tasks') || '[]');
+    let tasks = [];
+    let notes = [];
     let currentCalendarDate = new Date();
     let selectedDate = new Date().toISOString().split('T')[0];
     let currentMiniCalendarDate = new Date();
@@ -11,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let timeLeft = 25 * 60;
     let isRunning = false;
     let studyTimeToday = parseInt(localStorage.getItem('grevillea_study_time') || '0');
+    
+    // Get Supabase client
+    const supabase = getSupabase();
     
     // DEFINE ALL FUNCTIONS
     
@@ -110,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cb.addEventListener('change', function() {
                     const taskIndex = parseInt(this.dataset.index);
                     tasks[taskIndex].completed = this.checked;
-                    saveTasks();
+                    saveTask(tasks[taskIndex]);
                     generateCalendar();
                     renderTasks();
                     showTasksForDate(selectedDate);
@@ -144,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cb.addEventListener('change', function() {
                     const index = parseInt(this.closest('.task-item').dataset.index);
                     tasks[index].completed = this.checked;
-                    saveTasks();
+                    saveTask(tasks[index]);
                     renderTasks();
                     generateCalendar();
                     updateStats();
@@ -162,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const newText = this.textContent.trim();
                         if (newText && newText !== tasks[index].text) {
                             tasks[index].text = newText;
-                            saveTasks();
+                            saveTask(tasks[index]);
                         }
                         renderTasks();
                     };
@@ -190,8 +194,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     e.stopPropagation();
                     const index = parseInt(this.dataset.index);
                     if (confirm('Delete this task?')) {
+                        const taskToDelete = tasks[index];
                         tasks.splice(index, 1);
-                        saveTasks();
+                        if (taskToDelete.id) deleteTask(taskToDelete.id);
                         renderTasks();
                         generateCalendar();
                         showTasksForDate(selectedDate);
@@ -301,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
             day.addEventListener('click', (e) => {
                 e.stopPropagation();
                 tasks[taskIndex].date = day.dataset.date;
-                saveTasks();
+                saveTask(tasks[taskIndex]);
                 renderTasks();
                 generateCalendar();
                 closeMiniCalendar();
@@ -315,8 +320,83 @@ document.addEventListener('DOMContentLoaded', function() {
         if (popup) popup.remove();
     }
     
-    function saveTasks() {
-        localStorage.setItem('grevillea_tasks', JSON.stringify(tasks));
+    async function loadTasks() {
+        if (!supabase) {
+            // Fallback to localStorage if Supabase not available
+            tasks = JSON.parse(localStorage.getItem('grevillea_tasks') || '[]');
+            return;
+        }
+        
+        const { data, error } = await supabase
+            .from('tasks')
+            .select('*')
+            .order('created_at', { ascending: true });
+        
+        if (error) {
+            console.error('Error loading tasks:', error);
+            // Fallback to localStorage
+            tasks = JSON.parse(localStorage.getItem('grevillea_tasks') || '[]');
+        } else {
+            tasks = data || [];
+            // Cache in localStorage for offline
+            localStorage.setItem('grevillea_tasks', JSON.stringify(tasks));
+        }
+    }
+    
+    async function saveTask(task) {
+        if (!supabase) {
+            // Fallback to localStorage
+            if (!task.id) task.id = Date.now().toString();
+            const existingIndex = tasks.findIndex(t => t.id === task.id);
+            if (existingIndex >= 0) {
+                tasks[existingIndex] = task;
+            } else {
+                tasks.push(task);
+            }
+            localStorage.setItem('grevillea_tasks', JSON.stringify(tasks));
+            return;
+        }
+        
+        const { data, error } = await supabase
+            .from('tasks')
+            .upsert(task)
+            .select()
+            .single();
+        
+        if (error) {
+            console.error('Error saving task:', error);
+        } else {
+            // Update local array
+            const index = tasks.findIndex(t => t.id === data.id);
+            if (index >= 0) {
+                tasks[index] = data;
+            } else {
+                tasks.push(data);
+            }
+            // Update cache
+            localStorage.setItem('grevillea_tasks', JSON.stringify(tasks));
+        }
+    }
+    
+    async function deleteTask(taskId) {
+        if (!supabase) {
+            // Fallback to localStorage
+            tasks = tasks.filter(t => t.id !== taskId);
+            localStorage.setItem('grevillea_tasks', JSON.stringify(tasks));
+            return;
+        }
+        
+        const { error } = await supabase
+            .from('tasks')
+            .delete()
+            .eq('id', taskId);
+        
+        if (error) {
+            console.error('Error deleting task:', error);
+        } else {
+            tasks = tasks.filter(t => t.id !== taskId);
+            localStorage.setItem('grevillea_tasks', JSON.stringify(tasks));
+        }
     }
     
     function escapeHtml(text) {
@@ -412,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Task creation functions
-    function addNewTask() {
+    async function addNewTask() {
         const newTaskInput = document.getElementById('new-task-input');
         const newTaskDate = document.getElementById('new-task-date');
         
@@ -422,15 +502,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const taskText = text || `Task ${tasks.length + 1}`;
         const taskDate = parseDDMMYY(dateStr) || selectedDate;
         
-        tasks.push({
+        const newTask = {
             text: taskText,
             completed: false,
             tag: 'General',
             date: taskDate,
             createdAt: new Date().toISOString()
-        });
+        };
         
-        saveTasks();
+        tasks.push(newTask);
+        await saveTask(newTask);
         renderTasks();
         generateCalendar();
         
@@ -544,13 +625,85 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // NOTES FUNCTIONALITY
-    let notes = JSON.parse(localStorage.getItem('grevillea_notes') || '[]');
     let currentNoteId = null;
     let expandedNotes = new Set();
     
-    function saveNotes() {
-        localStorage.setItem('grevillea_notes', JSON.stringify(notes));
-        updateNotesCount();
+    async function loadNotes() {
+        if (!supabase) {
+            // Fallback to localStorage
+            notes = JSON.parse(localStorage.getItem('grevillea_notes') || '[]');
+            return;
+        }
+        
+        const { data, error } = await supabase
+            .from('notes')
+            .select('*')
+            .order('created_at', { ascending: true });
+        
+        if (error) {
+            console.error('Error loading notes:', error);
+            notes = JSON.parse(localStorage.getItem('grevillea_notes') || '[]');
+        } else {
+            notes = data || [];
+            localStorage.setItem('grevillea_notes', JSON.stringify(notes));
+        }
+    }
+    
+    async function saveNote(note) {
+        if (!supabase) {
+            // Fallback to localStorage
+            if (!note.id) note.id = Date.now().toString();
+            const existingIndex = notes.findIndex(n => n.id === note.id);
+            if (existingIndex >= 0) {
+                notes[existingIndex] = note;
+            } else {
+                notes.push(note);
+            }
+            localStorage.setItem('grevillea_notes', JSON.stringify(notes));
+            updateNotesCount();
+            return;
+        }
+        
+        const { data, error } = await supabase
+            .from('notes')
+            .upsert(note)
+            .select()
+            .single();
+        
+        if (error) {
+            console.error('Error saving note:', error);
+        } else {
+            const index = notes.findIndex(n => n.id === data.id);
+            if (index >= 0) {
+                notes[index] = data;
+            } else {
+                notes.push(data);
+            }
+            localStorage.setItem('grevillea_notes', JSON.stringify(notes));
+            updateNotesCount();
+        }
+    }
+    
+    async function deleteNote(noteId) {
+        if (!supabase) {
+            notes = notes.filter(n => n.id !== noteId);
+            localStorage.setItem('grevillea_notes', JSON.stringify(notes));
+            updateNotesCount();
+            return;
+        }
+        
+        const { error } = await supabase
+            .from('notes')
+            .delete()
+            .eq('id', noteId);
+        
+        if (error) {
+            console.error('Error deleting note:', error);
+        } else {
+            notes = notes.filter(n => n.id !== noteId);
+            localStorage.setItem('grevillea_notes', JSON.stringify(notes));
+            updateNotesCount();
+        }
     }
     
     function updateNotesCount() {
@@ -661,7 +814,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderNotesList(); // Update active state
     }
     
-    function createNewNote() {
+    async function createNewNote() {
         const newNote = {
             id: Date.now().toString(),
             title: '',
@@ -672,7 +825,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         notes.push(newNote);
-        saveNotes();
+        await saveNote(newNote);
         renderNotesList();
         loadNote(newNote.id);
         
@@ -681,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (titleInput) titleInput.focus();
     }
     
-    function saveCurrentNote() {
+    async function saveCurrentNote() {
         if (!currentNoteId) return;
         
         const titleInput = document.getElementById('note-title-input');
@@ -695,7 +848,7 @@ document.addEventListener('DOMContentLoaded', function() {
             note.content = contentTextarea ? contentTextarea.value : '';
             note.updatedAt = new Date().toISOString();
             
-            saveNotes();
+            await saveNote(note);
             renderNotesList();
             
             // Show saved indicator
@@ -708,12 +861,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function deleteCurrentNote() {
+    async function deleteCurrentNote() {
         if (!currentNoteId) return;
         
         if (confirm('Delete this note?')) {
+            const noteToDelete = currentNoteId;
             notes = notes.filter(n => n.id !== currentNoteId);
-            saveNotes();
+            await deleteNote(noteToDelete);
             
             currentNoteId = null;
             
@@ -739,6 +893,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // INITIALIZE
     loadUserData();
+    
+    // Load from Supabase first, then render
+    await loadTasks();
+    await loadNotes();
+    
     generateCalendar();
     renderTasks();
     updateTimerDisplay();
