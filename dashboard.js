@@ -451,9 +451,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = `
             <div class="mini-calendar-header">
-                <button class="mini-prev">&lt;</button>
+                <button class="mini-prev" onclick="return false;" style="cursor:pointer;z-index:100;">&lt;</button>
                 <span>${monthNames[month]} ${year}</span>
-                <button class="mini-next">&gt;</button>
+                <button class="mini-next" onclick="return false;" style="cursor:pointer;z-index:100;">&gt;</button>
             </div>
             <div class="mini-calendar-grid">
         `;
@@ -470,31 +470,28 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '</div>';
         popup.innerHTML = html;
         
+        // Attach click handlers using addEventListener with capture
         const prevBtn = popup.querySelector('.mini-prev');
         const nextBtn = popup.querySelector('.mini-next');
         
-        console.log('Buttons found:', prevBtn, nextBtn);
-        
         if (prevBtn) {
-            prevBtn.onmousedown = (e) => {
-                e.stopPropagation();
+            prevBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log('Input prev clicked');
+                e.stopPropagation();
+                console.log('Prev arrow clicked');
                 currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
                 renderMiniCalendarInput(popup, targetInput);
-                return false;
-            };
+            }, true);
         }
         
         if (nextBtn) {
-            nextBtn.onmousedown = (e) => {
-                e.stopPropagation();
+            nextBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log('Input next clicked');
+                e.stopPropagation();
+                console.log('Next arrow clicked');
                 currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
                 renderMiniCalendarInput(popup, targetInput);
-                return false;
-            };
+            }, true);
         }
         
         popup.querySelectorAll('.mini-calendar-day').forEach(day => {
