@@ -277,17 +277,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const prevBtn = container.querySelector('.mini-prev');
         const nextBtn = container.querySelector('.mini-next');
         
-        prevBtn.onclick = (e) => {
-            e.stopPropagation();
-            currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
-            renderMiniCalendarForTask(container, taskIndex);
-        };
+        if (prevBtn) {
+            prevBtn.onclick = (e) => {
+                e.stopPropagation();
+                console.log('Prev clicked, current month:', currentMiniCalendarDate.getMonth());
+                currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
+                console.log('New month:', currentMiniCalendarDate.getMonth());
+                renderMiniCalendarForTask(container, taskIndex);
+            };
+        }
         
-        nextBtn.onclick = (e) => {
-            e.stopPropagation();
-            currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
-            renderMiniCalendarForTask(container, taskIndex);
-        };
+        if (nextBtn) {
+            nextBtn.onclick = (e) => {
+                e.stopPropagation();
+                console.log('Next clicked, current month:', currentMiniCalendarDate.getMonth());
+                currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
+                console.log('New month:', currentMiniCalendarDate.getMonth());
+                renderMiniCalendarForTask(container, taskIndex);
+            };
+        }
         
         container.querySelectorAll('.mini-calendar-day').forEach(day => {
             day.addEventListener('click', (e) => {
@@ -462,17 +470,26 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '</div>';
         popup.innerHTML = html;
         
-        popup.querySelector('.mini-prev').onclick = (e) => {
-            e.stopPropagation();
-            currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
-            renderMiniCalendarInput(popup, targetInput);
-        };
+        const prevBtn = popup.querySelector('.mini-prev');
+        const nextBtn = popup.querySelector('.mini-next');
         
-        popup.querySelector('.mini-next').onclick = (e) => {
-            e.stopPropagation();
-            currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
-            renderMiniCalendarInput(popup, targetInput);
-        };
+        if (prevBtn) {
+            prevBtn.onclick = (e) => {
+                e.stopPropagation();
+                console.log('Input prev clicked');
+                currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() - 1);
+                renderMiniCalendarInput(popup, targetInput);
+            };
+        }
+        
+        if (nextBtn) {
+            nextBtn.onclick = (e) => {
+                e.stopPropagation();
+                console.log('Input next clicked');
+                currentMiniCalendarDate.setMonth(currentMiniCalendarDate.getMonth() + 1);
+                renderMiniCalendarInput(popup, targetInput);
+            };
+        }
         
         popup.querySelectorAll('.mini-calendar-day').forEach(day => {
             day.onclick = (e) => {
