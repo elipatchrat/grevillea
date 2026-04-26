@@ -28,9 +28,13 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
         const { data, error } = await supabase
             .from('user_stats')
             .select('*')
+            .eq('user_id', user.id)
             .single();
         
         if (error && error.code !== 'PGRST116') {
@@ -59,11 +63,15 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
         const today = new Date().toISOString().split('T')[0];
         
         const { error } = await supabase
             .from('user_stats')
             .upsert({
+                user_id: user.id,
                 study_time_today: studyTimeToday,
                 current_streak: currentStreak,
                 last_study_date: today
