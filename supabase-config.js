@@ -28,6 +28,18 @@
 // );
 // alter table notes enable row level security;
 // create policy "Users can only access their own notes" on notes for all using (auth.uid() = user_id);
+//
+// -- User stats table (study time & streak)
+// create table user_stats (
+//   id uuid default gen_random_uuid() primary key,
+//   user_id uuid references auth.users(id) on delete cascade,
+//   study_time_today integer default 0,
+//   current_streak integer default 0,
+//   last_study_date date,
+//   updated_at timestamptz default now()
+// );
+// alter table user_stats enable row level security;
+// create policy "Users can only access their own stats" on user_stats for all using (auth.uid() = user_id);
 
 const SUPABASE_URL = 'https://asylgnxgjyubixorsfmg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzeWxnbnhnanl1Yml4b3JzZm1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNDA0MjUsImV4cCI6MjA5MTgxNjQyNX0.gRFw2KL8yUtJ74OUUcUKREKAj1DoXep_gmwr5ZfOYOI';

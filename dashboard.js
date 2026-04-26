@@ -12,10 +12,98 @@ document.addEventListener('DOMContentLoaded', async function() {
     let timeLeft = 25 * 60;
     let isRunning = false;
     let studyTimeToday = parseInt(localStorage.getItem('grevillea_study_time') || '0');
+    let currentStreak = parseInt(localStorage.getItem('grevillea_streak') || '0');
+    let lastStudyDate = localStorage.getItem('grevillea_last_study_date') || null;
     
     // Get Supabase client
     const supabase = getSupabase();
     
+    // USER STATS FUNCTIONS
+    async function loadUserStats() {
+        if (!supabase) {
+            studyTimeToday = parseInt(localStorage.getItem('grevillea_study_time') || '0');
+            currentStreak = parseInt(localStorage.getItem('grevillea_streak') || '0');
+            lastStudyDate = localStorage.getItem('grevillea_last_study_date') || null;
+            updateStreakDisplay();
+            return;
+        }
+        
+        const { data, error } = await supabase
+            .from('user_stats')
+            .select('*')
+            .single();
+        
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error loading user stats:', error);
+            return;
+        }
+        
+        if (data) {
+            studyTimeToday = data.study_time_today || 0;
+            currentStreak = data.current_streak || 0;
+            lastStudyDate = data.last_study_date;
+            
+            localStorage.setItem('grevillea_study_time', studyTimeToday.toString());
+            localStorage.setItem('grevillea_streak', currentStreak.toString());
+            localStorage.setItem('grevillea_last_study_date', lastStudyDate || '');
+        }
+        updateStreakDisplay();
+        updateStudyTimeDisplay();
+    }
+    
+    async function saveUserStats() {
+        if (!supabase) {
+            localStorage.setItem('grevillea_study_time', studyTimeToday.toString());
+            localStorage.setItem('grevillea_streak', currentStreak.toString());
+            localStorage.setItem('grevillea_last_study_date', new Date().toISOString().split('T')[0]);
+            return;
+        }
+        
+        const today = new Date().toISOString().split('T')[0];
+        
+        const { error } = await supabase
+            .from('user_stats')
+            .upsert({
+                study_time_today: studyTimeToday,
+                current_streak: currentStreak,
+                last_study_date: today
+            }, { onConflict: 'user_id' });
+        
+        if (error) {
+            console.error('Error saving user stats:', error);
+        } else {
+            localStorage.setItem('grevillea_study_time', studyTimeToday.toString());
+            localStorage.setItem('grevillea_streak', currentStreak.toString());
+            localStorage.setItem('grevillea_last_study_date', today);
+        }
+    }
+    
+    function updateStreak() {
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        
+        if (!lastStudyDate) {
+            currentStreak = 1;
+        } else if (lastStudyDate === today) {
+            // Already studied today, streak continues
+        } else if (lastStudyDate === yesterday) {
+            currentStreak++;
+        } else {
+            currentStreak = 1;
+        }
+        
+        lastStudyDate = today;
+        updateStreakDisplay();
+        saveUserStats();
+    }
+    
+    function updateStreakDisplay() {
+        const streakEl = document.getElementById('streak-count');
+        if (streakEl) {
+            streakEl.textContent = currentStreak;
+        }
+    }
+
     // DEFINE ALL FUNCTIONS
     
     function loadUserData() {
@@ -450,12 +538,18 @@ document.addEventListener('DOMContentLoaded', async function() {
                 studyTimeToday++;
                 updateTimerDisplay();
                 updateStudyTimeDisplay();
-                localStorage.setItem('grevillea_study_time', studyTimeToday.toString());
+                
+                // Save every minute
+                if (studyTimeToday % 60 === 0) {
+                    saveUserStats();
+                }
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     isRunning = false;
                     if (startBtn) startBtn.textContent = 'Start';
+                    updateStreak();
+                    saveUserStats();
                     alert('Pomodoro session complete! Take a break.');
                     timeLeft = 25 * 60;
                     updateTimerDisplay();
@@ -895,6 +989,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadUserData();
     
     // Load from Supabase first, then render
+    await loadUserStats();
     await loadTasks();
     await loadNotes();
     
