@@ -34,18 +34,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         const { data, error } = await supabase
             .from('user_stats')
             .select('*')
-            .eq('user_id', user.id)
-            .single();
+            .eq('user_id', user.id);
         
-        if (error && error.code !== 'PGRST116') {
+        if (error) {
             console.error('Error loading user stats:', error);
             return;
         }
         
-        if (data) {
-            studyTimeToday = data.study_time_today || 0;
-            currentStreak = data.current_streak || 0;
-            lastStudyDate = data.last_study_date;
+        if (data && data.length > 0) {
+            studyTimeToday = data[0].study_time_today || 0;
+            currentStreak = data[0].current_streak || 0;
+            lastStudyDate = data[0].last_study_date;
             
             localStorage.setItem('grevillea_study_time', studyTimeToday.toString());
             localStorage.setItem('grevillea_streak', currentStreak.toString());
@@ -68,14 +67,27 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         const today = new Date().toISOString().split('T')[0];
         
+        // First check if row exists
+        const { data: existing } = await supabase
+            .from('user_stats')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle();
+        
+        const statsData = {
+            user_id: user.id,
+            study_time_today: studyTimeToday,
+            current_streak: currentStreak,
+            last_study_date: today
+        };
+        
+        if (existing) {
+            statsData.id = existing.id;
+        }
+        
         const { error } = await supabase
             .from('user_stats')
-            .upsert({
-                user_id: user.id,
-                study_time_today: studyTimeToday,
-                current_streak: currentStreak,
-                last_study_date: today
-            }, { onConflict: 'user_id' });
+            .upsert(statsData);
         
         if (error) {
             console.error('Error saving user stats:', error);
