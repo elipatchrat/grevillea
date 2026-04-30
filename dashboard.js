@@ -423,9 +423,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            tasks = JSON.parse(localStorage.getItem('grevillea_tasks') || '[]');
+            return;
+        }
+        
         const { data, error } = await supabase
             .from('tasks')
             .select('*')
+            .eq('user_id', user.id)
             .order('created_at', { ascending: true });
         
         if (error) {
@@ -453,9 +460,17 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            console.error('No user logged in');
+            return;
+        }
+        
+        const taskWithUser = { ...task, user_id: user.id };
+        
         const { data, error } = await supabase
             .from('tasks')
-            .upsert(task)
+            .upsert(taskWithUser)
             .select()
             .single();
         
@@ -737,9 +752,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            notes = JSON.parse(localStorage.getItem('grevillea_notes') || '[]');
+            return;
+        }
+        
         const { data, error } = await supabase
             .from('notes')
             .select('*')
+            .eq('user_id', user.id)
             .order('created_at', { ascending: true });
         
         if (error) {
@@ -766,9 +788,17 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            console.error('No user logged in');
+            return;
+        }
+        
+        const noteWithUser = { ...note, user_id: user.id };
+        
         const { data, error } = await supabase
             .from('notes')
-            .upsert(note)
+            .upsert(noteWithUser)
             .select()
             .single();
         
